@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Daily Tasks</title>
+<style>
+  :root{
+    --bg: #000000;
+    --panel: #1c1c1e;
+    --panel-alt: #232325;
+    --text: #f2f2f5;
+    --text-faded: #6b6b6f;
+    --gray: #3a3a3c;
+    --gray-active: #48484a;
+    --green: #34c85a;
+    --red: #ff4d4d;
+    --divider: #2c2c2e;
+    --danger: #ff4d4d;
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .app {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 20px 16px 48px;
+    min-height: 100vh;
+  }
+
+  /* Date input */
+  .date-field {
+    width: 100%;
+    background: var(--panel);
+    border: 1px solid var(--divider);
+    border-radius: 14px;
+    padding: 16px 16px;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 22px;
+    outline: none;
+  }
+  .date-field::placeholder { color: var(--text-faded); font-weight: 500; }
+  .date-field:focus { border-color: #4a4a4d; }
+
+  /* Section */
+  .section {
+    background: var(--panel);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  .section-title {
+    text-align: left;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    color: var(--text);
+    margin: 0 0 12px 2px;
+  }
+
+  .sub-title {
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-faded);
+    margin: 0 0 8px 2px;
+  }
+
+  /* PDR buttons row */
+  .pdr-row {
+    display: flex;
+    gap: 10px;
+  }
+  .pdr-btn {
+    flex: 1 1 0;
+    min-width: 0;
+    height: 52px;
+    border-radius: 14px;
+    border: none;
+    background: var(--gray);
+    color: var(--text);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s ease, transform 0.08s ease;
+  }
+  .pdr-btn:active { transform: scale(0.96); background: var(--gray-active); }
+
+  /* Mood / status buttons row */
+  .status-row {
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+  }
+
+  .status-btn {
+    flex: 1 1 0;
+    aspect-ratio: 1 / 1;
+    border-radius: 16px;
+    border: none;
+    background: var(--gray);
+    cursor: pointer;
+    transition: background-color 0.15s ease, transform 0.08s ease;
+    padding: 0;
+  }
+  .status-btn:active { transform: scale(0.93); }
+  .status-btn.state-green { background: var(--green); }
+  .status-btn.state-red { background: var(--red); }
+
+  /* Chess single button */
+  .chess-btn {
+    width: 100%;
+    height: 56px;
+    border-radius: 16px;
+    border: none;
+    background: var(--gray);
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s ease, transform 0.08s ease;
+  }
+  .chess-btn:active { transform: scale(0.98); }
+  .chess-btn.state-green { background: var(--green); color: #06210f; }
+  .chess-btn.state-red { background: var(--red); color: #2a0000; }
+
+  /* Task rows */
+  .task-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 2px;
+    border-bottom: 1px solid var(--divider);
+  }
+  .task-row:last-child { border-bottom: none; }
+
+  .checkbox {
+    flex: 0 0 auto;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid #5a5a5d;
+    background: transparent;
+    cursor: pointer;
+    position: relative;
+    padding: 0;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+  }
+  .checkbox.checked {
+    background: var(--green);
+    border-color: var(--green);
+  }
+  .checkbox.checked::after {
+    content: "";
+    position: absolute;
+    left: 7px;
+    top: 3px;
+    width: 6px;
+    height: 11px;
+    border: solid #06210f;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+
+  .task-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-size: 16px;
+    font-family: inherit;
+    padding: 4px 0;
+  }
+  .task-input::placeholder { color: var(--text-faded); }
+  .task-input.done {
+    color: var(--text-faded);
+    text-decoration: line-through;
+    text-decoration-color: var(--text-faded);
+  }
+
+  .two-col {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  @media (min-width: 380px) {
+    .two-col { flex-direction: row; }
+    .two-col .sub-section { flex: 1; min-width: 0; }
+  }
+
+  /* Reset button */
+  .reset-btn {
+    width: 100%;
+    padding: 15px;
+    border-radius: 14px;
+    border: 1px solid #3a1414;
+    background: #1c1010;
+    color: var(--danger);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+  .reset-btn:active { background: #241414; }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 10;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: var(--panel-alt);
+    border-radius: 16px;
+    padding: 20px;
+    max-width: 320px;
+    width: 100%;
+    text-align: center;
+  }
+  .modal p { font-size: 15px; color: var(--text); margin: 0 0 18px; line-height: 1.4; }
+  .modal-actions { display: flex; gap: 10px; }
+  .modal-actions button {
+    flex: 1;
+    padding: 12px;
+    border-radius: 12px;
+    border: none;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .modal-cancel { background: var(--gray); color: var(--text); }
+  .modal-confirm { background: var(--red); color: #2a0000; }
+
+  .info-modal p {
+    text-align: left;
+    white-space: pre-line;
+    line-height: 1.5;
+  }
+  .info-modal h3 {
+    margin: 0 0 10px;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    text-align: left;
+  }
+  .modal-ok {
+    width: 100%;
+    background: var(--gray);
+    color: var(--text);
+    padding: 12px;
+    border-radius: 12px;
+    border: none;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .save-note {
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-faded);
+    margin-top: 4px;
+    min-height: 16px;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <input type="text" class="date-field" id="dateField" placeholder="Day, Date...">
+
+  <!-- Plan / Do / Review -->
+  <div class="section">
+    <div class="pdr-row">
+      <button class="pdr-btn" id="planBtn">Plan</button>
+      <button class="pdr-btn" id="doBtn">Do</button>
+      <button class="pdr-btn" id="reviewBtn">Review</button>
+    </div>
+  </div>
+
+  <!-- Section 1: status buttons -->
+  <div class="section">
+    <div class="status-row" id="statusRow"></div>
+  </div>
+
+  <!-- Section 2 -->
+  <div class="section">
+    <div class="section-title">The German Dentist</div>
+    <div id="germanDentist"></div>
+  </div>
+
+  <!-- Section 3 -->
+  <div class="section">
+    <div class="section-title">The Best of All</div>
+    <div class="two-col">
+      <div class="sub-section">
+        <div id="bestOfAllA"></div>
+      </div>
+      <div class="sub-section">
+        <div id="bestOfAllB"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 4 -->
+  <div class="section">
+    <div class="section-title">Health</div>
+    <div id="health"></div>
+  </div>
+
+  <!-- Section 5: chess -->
+  <div class="section">
+    <button class="chess-btn" id="chessBtn">Chess</button>
+  </div>
+
+  <!-- Section 6 -->
+  <div class="section">
+    <div class="section-title">Other Tasks</div>
+    <div id="otherTasks"></div>
+  </div>
+
+  <button class="reset-btn" id="resetBtn">Reset Everything</button>
+  <div class="save-note" id="saveNote"></div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <p>Reset all tasks and inputs? This can't be undone.</p>
+    <div class="modal-actions">
+      <button class="modal-cancel" id="modalCancel">Cancel</button>
+      <button class="modal-confirm" id="modalConfirm">Reset</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="infoOverlay">
+  <div class="modal info-modal">
+    <h3 id="infoTitle"></h3>
+    <p id="infoText"></p>
+    <button class="modal-ok" id="infoOk">OK</button>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'todo-app-state-v1';
+
+function defaultState() {
+  return {
+    date: '',
+    statusButtons: [0,0,0,0,0], // 0=gray,1=green,2=red
+    chess: 0,
+    germanDentist: [
+      {text:'', checked:false},
+      {text:'', checked:false},
+      {text:'', checked:false},
+      {text:'', checked:false}
+    ],
+    bestOfAllA: [
+      {text:'', checked:false},
+      {text:'', checked:false},
+      {text:'', checked:false}
+    ],
+    bestOfAllB: [
+      {text:'', checked:false},
+      {text:'', checked:false},
+      {text:'', checked:false}
+    ],
+    health: [
+      {text:'', checked:false},
+      {text:'', checked:false},
+      {text:'', checked:false}
+    ],
+    otherTasks: [
+      {text:'', checked:false},
+      {text:'', checked:false},
+      {text:'', checked:false},
+      {text:'', checked:false}
+    ]
+  };
+}
+
+let state = defaultState();
+let saveTimer = null;
+
+function scheduleSave() {
+  const note = document.getElementById('saveNote');
+  if (note) note.textContent = 'Saving…';
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      if (note) note.textContent = 'Saved';
+      setTimeout(() => { if (note) note.textContent = ''; }, 1000);
+    } catch (e) {
+      if (note) note.textContent = 'Could not save';
+      console.error('Save error', e);
+    }
+  }, 250);
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      state = Object.assign(defaultState(), parsed);
+    }
+  } catch (e) {
+    // no saved state yet, use defaults
+  }
+}
+
+function cycleStatus(val) {
+  return (val + 1) % 3;
+}
+function statusClass(val) {
+  if (val === 1) return 'state-green';
+  if (val === 2) return 'state-red';
+  return '';
+}
+
+function renderStatusRow() {
+  const row = document.getElementById('statusRow');
+  row.innerHTML = '';
+  state.statusButtons.forEach((val, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'status-btn ' + statusClass(val);
+    btn.setAttribute('aria-label', 'Task button ' + (i+1));
+    btn.addEventListener('click', () => {
+      state.statusButtons[i] = cycleStatus(state.statusButtons[i]);
+      btn.className = 'status-btn ' + statusClass(state.statusButtons[i]);
+      scheduleSave();
+    });
+    row.appendChild(btn);
+  });
+}
+
+function renderChess() {
+  const btn = document.getElementById('chessBtn');
+  btn.className = 'chess-btn ' + statusClass(state.chess);
+  btn.onclick = () => {
+    state.chess = cycleStatus(state.chess);
+    btn.className = 'chess-btn ' + statusClass(state.chess);
+    scheduleSave();
+  };
+}
+
+function renderTaskList(containerId, listKey, placeholder) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  state[listKey].forEach((item, i) => {
+    const row = document.createElement('div');
+    row.className = 'task-row';
+
+    const cb = document.createElement('button');
+    cb.className = 'checkbox' + (item.checked ? ' checked' : '');
+    cb.setAttribute('aria-label', 'Toggle task');
+    cb.addEventListener('click', () => {
+      state[listKey][i].checked = !state[listKey][i].checked;
+      cb.classList.toggle('checked', state[listKey][i].checked);
+      input.classList.toggle('done', state[listKey][i].checked);
+      scheduleSave();
+    });
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'task-input' + (item.checked ? ' done' : '');
+    input.placeholder = placeholder || 'Task';
+    input.value = item.text;
+    input.addEventListener('input', () => {
+      state[listKey][i].text = input.value;
+      scheduleSave();
+    });
+
+    row.appendChild(cb);
+    row.appendChild(input);
+    container.appendChild(row);
+  });
+}
+
+function renderDate() {
+  const field = document.getElementById('dateField');
+  field.value = state.date;
+  field.addEventListener('input', () => {
+    state.date = field.value;
+    scheduleSave();
+  });
+}
+
+function renderAll() {
+  renderDate();
+  renderStatusRow();
+  renderTaskList('germanDentist', 'germanDentist');
+  renderTaskList('bestOfAllA', 'bestOfAllA');
+  renderTaskList('bestOfAllB', 'bestOfAllB');
+  renderTaskList('health', 'health');
+  renderChess();
+  renderTaskList('otherTasks', 'otherTasks');
+}
+
+function setupPdr() {
+  const overlay = document.getElementById('infoOverlay');
+  const titleEl = document.getElementById('infoTitle');
+  const textEl = document.getElementById('infoText');
+  const okBtn = document.getElementById('infoOk');
+
+  const content = {
+    plan: {
+      title: 'Plan',
+      text: 'How to be in a better position'
+    },
+    doStep: {
+      title: 'Do',
+      text: '1- Realize the distortion illusion: it wasn\'t that bad\n2- Scale it and accept it: not 0 or 100\n3- Divide and conquer: Don\'t overwhelm yourself'
+    },
+    review: {
+      title: 'Review',
+      text: 'Am I in a better position'
+    }
+  };
+
+  function openInfo(key) {
+    titleEl.textContent = content[key].title;
+    textEl.textContent = content[key].text;
+    overlay.classList.add('show');
+  }
+
+  document.getElementById('planBtn').addEventListener('click', () => openInfo('plan'));
+  document.getElementById('doBtn').addEventListener('click', () => openInfo('doStep'));
+  document.getElementById('reviewBtn').addEventListener('click', () => openInfo('review'));
+  okBtn.addEventListener('click', () => overlay.classList.remove('show'));
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('show'); });
+}
+
+function setupReset() {
+  const resetBtn = document.getElementById('resetBtn');
+  const overlay = document.getElementById('modalOverlay');
+  const cancelBtn = document.getElementById('modalCancel');
+  const confirmBtn = document.getElementById('modalConfirm');
+
+  resetBtn.addEventListener('click', () => overlay.classList.add('show'));
+  cancelBtn.addEventListener('click', () => overlay.classList.remove('show'));
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('show'); });
+
+  confirmBtn.addEventListener('click', () => {
+    state = defaultState();
+    renderAll();
+    overlay.classList.remove('show');
+    scheduleSave();
+  });
+}
+
+(function init() {
+  loadState();
+  renderAll();
+  setupPdr();
+  setupReset();
+})();
+</script>
+</body>
+</html>
