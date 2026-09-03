@@ -1,581 +1,610 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Daily Tasks</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>قد أفلح</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg: #000000;
-    --panel: #1c1c1e;
-    --panel-alt: #232325;
-    --text: #f2f2f5;
-    --text-faded: #6b6b6f;
-    --gray: #3a3a3c;
-    --gray-active: #48484a;
-    --green: #34c85a;
-    --red: #ff4d4d;
-    --divider: #2c2c2e;
-    --danger: #ff4d4d;
+    --bg: #0a0e14;
+    --surface: #131a24;
+    --border: #232d3a;
+    --text: #e9e6df;
+    --text-dim: #8b96a3;
+    --text-faint: #5b6673;
+    --accent: #c9a66b;
+    --accent-soft: #8c7245;
+    --accent-wash: rgba(201,166,107,0.10);
   }
-
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-  html, body {
-    margin: 0;
-    padding: 0;
-    background: var(--bg);
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: radial-gradient(1200px 600px at 50% -10%, #10161f 0%, var(--bg) 60%);
     color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: 'Tajawal', sans-serif;
+    min-height: 100vh;
     -webkit-font-smoothing: antialiased;
   }
+  .app{ max-width: 480px; margin: 0 auto; min-height: 100vh; padding: 22px 20px 60px; }
+  .topbar{ display:flex; align-items:center; justify-content:space-between; min-height: 40px; margin-bottom: 6px; }
+  .backbtn{
+    display:flex; align-items:center; gap:6px; background:none; border:none;
+    color: var(--text-dim); font-family:'Tajawal',sans-serif; font-size: 15px; font-weight: 500;
+    padding: 8px 4px; cursor:pointer; opacity:0; pointer-events:none; transition: opacity .2s, color .2s;
+  }
+  .backbtn.show{ opacity:1; pointer-events:auto; }
+  .backbtn:active{ color: var(--accent); }
+  .backbtn svg{ width:16px; height:16px; transform: scaleX(-1); }
+  .crumb{ font-size: 12px; color: var(--text-faint); font-weight: 500; text-align: left; direction: rtl; max-width: 60%; }
 
-  .app {
-    max-width: 480px;
-    margin: 0 auto;
-    padding: 20px 16px 48px;
-    min-height: 100vh;
-  }
+  .screen{ display:none; animation: rise .28s ease; }
+  .screen.active{ display:block; }
+  @keyframes rise{ from{ opacity:0; transform: translateY(8px);} to{ opacity:1; transform: translateY(0);} }
 
-  /* Date input */
-  .date-field {
-    width: 100%;
-    background: var(--panel);
-    border: 1px solid var(--divider);
-    border-radius: 14px;
-    padding: 16px 16px;
-    font-size: 17px;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 22px;
-    outline: none;
+  /* HOME */
+  .home-hero{ text-align:center; padding: 40px 6px 26px; }
+  .home-hero h1{ font-size: 40px; font-weight: 900; margin: 0 0 10px; }
+  .home-hero p{ color: var(--text-dim); font-size: 15px; line-height: 1.9; max-width: 320px; margin: 0 auto; }
+  .home-list{ display:flex; flex-direction:column; gap: 12px; margin-top: 26px; }
+  .home-btn{
+    display:flex; align-items:center; justify-content:space-between; gap: 14px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+    padding: 20px; cursor:pointer; text-align:right; transition: border-color .2s, transform .15s, background .2s;
   }
-  .date-field::placeholder { color: var(--text-faded); font-weight: 500; }
-  .date-field:focus { border-color: #4a4a4d; }
+  .home-btn:active{ transform: scale(0.98); }
+  .home-btn.ready:active{ background: var(--accent-wash); border-color: var(--accent-soft); }
+  .home-btn .label{ font-size: 18px; font-weight: 700; }
+  .home-btn .sub{ font-size: 12.5px; color: var(--text-faint); margin-top: 4px; }
+  .home-btn .chev{ color: var(--text-faint); font-size: 18px; flex-shrink:0; }
+  .home-btn.soon{ opacity: 0.45; cursor: default; }
+  .home-btn .badge{ font-size: 11px; color: var(--text-faint); border: 1px solid var(--border); border-radius: 999px; padding: 3px 10px; flex-shrink:0; }
 
-  /* Section */
-  .section {
-    background: var(--panel);
-    border-radius: 16px;
-    padding: 16px;
-    margin-bottom: 16px;
+  /* INTRO */
+  .intro-card{ background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 26px 22px; margin-top: 18px; line-height: 2.1; font-size: 16px; }
+  .intro-card .line{ margin-bottom: 4px; }
+  .title-block{ text-align:center; margin: 8px 0 4px; }
+  .title-block h2{ font-size: 24px; font-weight:800; margin:0 0 6px; }
+  .title-block p{ color: var(--text-faint); font-size: 13px; margin:0; }
+  .cta{
+    display:block; width:100%; margin-top: 22px; padding: 16px; border-radius: 14px; border: none;
+    background: var(--accent); color: #14100a; font-family:'Tajawal',sans-serif; font-size: 16px; font-weight: 800;
+    cursor: pointer; transition: transform .15s, filter .2s;
   }
+  .cta:active{ transform: scale(0.98); filter: brightness(0.95); }
 
-  .section-title {
-    text-align: left;
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: 0.2px;
-    color: var(--text);
-    margin: 0 0 12px 2px;
-  }
+  .question{ text-align:center; font-size: 17px; font-weight: 700; margin: 22px 4px 16px; line-height: 1.8; }
 
-  .sub-title {
-    text-align: left;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-faded);
-    margin: 0 0 8px 2px;
+  /* LEVEL 1 - plain list, no icons */
+  .list1{ display:flex; flex-direction:column; gap: 10px; }
+  .fadila-btn{
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 16px 18px; cursor:pointer; text-align:right; font-size: 15.5px; font-weight: 600;
+    line-height: 1.7; transition: border-color .2s, background .2s, transform .15s;
   }
+  .fadila-btn:active{ transform: scale(0.98); background: var(--accent-wash); border-color: var(--accent-soft); }
 
-  /* PDR buttons row */
-  .pdr-row {
-    display: flex;
-    gap: 10px;
-  }
-  .pdr-btn {
-    flex: 1 1 0;
-    min-width: 0;
-    height: 52px;
-    border-radius: 14px;
-    border: none;
-    background: var(--gray);
-    color: var(--text);
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.15s ease, transform 0.08s ease;
-  }
-  .pdr-btn:active { transform: scale(0.96); background: var(--gray-active); }
+  .chosen-pill{ background: var(--accent-wash); border: 1px solid var(--accent-soft); border-radius: 14px; padding: 12px 16px; margin-bottom: 6px; }
+  .chosen-pill .tag{ font-size: 10.5px; color: var(--text-faint); font-weight:500; display:block; margin-bottom:2px; }
+  .chosen-pill .tx{ font-size: 14.5px; font-weight:700; color: var(--accent); line-height:1.6; }
 
-  /* Mood / status buttons row */
-  .status-row {
-    display: flex;
-    gap: 10px;
-    justify-content: space-between;
+  .list2{ display:flex; flex-direction:column; gap: 10px; }
+  .amal-btn{
+    display:flex; align-items:center; justify-content:space-between; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 14px; padding: 16px 18px; cursor:pointer;
+    transition: border-color .2s, background .2s, transform .15s;
   }
+  .amal-btn:active{ transform: scale(0.98); background: var(--accent-wash); border-color: var(--accent-soft); }
+  .amal-btn .lb{ font-size: 15.5px; font-weight:600; }
+  .amal-btn .chev{ color: var(--text-faint); font-size:16px; }
 
-  .status-btn {
-    flex: 1 1 0;
-    aspect-ratio: 1 / 1;
-    border-radius: 16px;
-    border: none;
-    background: var(--gray);
-    cursor: pointer;
-    transition: background-color 0.15s ease, transform 0.08s ease;
-    padding: 0;
-  }
-  .status-btn:active { transform: scale(0.93); }
-  .status-btn.state-green { background: var(--green); }
-  .status-btn.state-red { background: var(--red); }
+  .chosen-trail{ display:flex; flex-direction:column; gap:8px; margin-bottom: 4px; }
+  .source-card{ margin-top: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 22px 20px 18px; position: relative; overflow:hidden; }
+  .source-card::before{ content:""; position:absolute; top:0; bottom:0; right:0; width:3px; background: var(--accent); }
+  .source-card + .source-card{ margin-top: 12px; }
+  .source-card .txt{ font-size: 16px; line-height: 2.1; }
+  .source-card .cite{ margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--border); font-size: 13px; color: var(--accent); font-weight: 700; text-align:left; direction: rtl; }
 
-  /* Chess single button */
-  .chess-btn {
-    width: 100%;
-    height: 56px;
-    border-radius: 16px;
-    border: none;
-    background: var(--gray);
-    color: var(--text);
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.15s ease, transform 0.08s ease;
-  }
-  .chess-btn:active { transform: scale(0.98); }
-  .chess-btn.state-green { background: var(--green); color: #06210f; }
-  .chess-btn.state-red { background: var(--red); color: #2a0000; }
+  .end-actions{ display:flex; gap:10px; margin-top: 20px; }
+  .end-actions button{ flex:1; padding: 14px; border-radius: 14px; font-family:'Tajawal',sans-serif; font-size: 14.5px; font-weight: 700; cursor:pointer; border: 1px solid var(--border); background: var(--surface); color: var(--text); }
+  .end-actions button.primary{ background: var(--accent); color: #14100a; border: none; }
+  .end-actions button:active{ transform: scale(0.97); }
 
-  /* Task rows */
-  .task-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 2px;
-    border-bottom: 1px solid var(--divider);
-  }
-  .task-row:last-child { border-bottom: none; }
-
-  .checkbox {
-    flex: 0 0 auto;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    border: 2px solid #5a5a5d;
-    background: transparent;
-    cursor: pointer;
-    position: relative;
-    padding: 0;
-    transition: background-color 0.15s ease, border-color 0.15s ease;
-  }
-  .checkbox.checked {
-    background: var(--green);
-    border-color: var(--green);
-  }
-  .checkbox.checked::after {
-    content: "";
-    position: absolute;
-    left: 7px;
-    top: 3px;
-    width: 6px;
-    height: 11px;
-    border: solid #06210f;
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
-  }
-
-  .task-input {
-    flex: 1 1 auto;
-    min-width: 0;
-    background: transparent;
-    border: none;
-    outline: none;
-    color: var(--text);
-    font-size: 16px;
-    font-family: inherit;
-    padding: 4px 0;
-  }
-  .task-input::placeholder { color: var(--text-faded); }
-  .task-input.done {
-    color: var(--text-faded);
-    text-decoration: line-through;
-    text-decoration-color: var(--text-faded);
-  }
-
-  .two-col {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-  @media (min-width: 380px) {
-    .two-col { flex-direction: row; }
-    .two-col .sub-section { flex: 1; min-width: 0; }
-  }
-
-  /* Reset button */
-  .reset-btn {
-    width: 100%;
-    padding: 15px;
-    border-radius: 14px;
-    border: 1px solid #3a1414;
-    background: #1c1010;
-    color: var(--danger);
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    margin-top: 8px;
-  }
-  .reset-btn:active { background: #241414; }
-
-  /* Modal */
-  .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.6);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    z-index: 10;
-  }
-  .modal-overlay.show { display: flex; }
-  .modal {
-    background: var(--panel-alt);
-    border-radius: 16px;
-    padding: 20px;
-    max-width: 320px;
-    width: 100%;
-    text-align: center;
-  }
-  .modal p { font-size: 15px; color: var(--text); margin: 0 0 18px; line-height: 1.4; }
-  .modal-actions { display: flex; gap: 10px; }
-  .modal-actions button {
-    flex: 1;
-    padding: 12px;
-    border-radius: 12px;
-    border: none;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-  }
-  .modal-cancel { background: var(--gray); color: var(--text); }
-  .modal-confirm { background: var(--red); color: #2a0000; }
-
-  .info-modal p {
-    text-align: left;
-    white-space: pre-line;
-    line-height: 1.5;
-  }
-  .info-modal h3 {
-    margin: 0 0 10px;
-    font-size: 17px;
-    font-weight: 700;
-    color: var(--text);
-    text-align: left;
-  }
-  .modal-ok {
-    width: 100%;
-    background: var(--gray);
-    color: var(--text);
-    padding: 12px;
-    border-radius: 12px;
-    border: none;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-  }
-
-  .save-note {
-    text-align: center;
-    font-size: 12px;
-    color: var(--text-faded);
-    margin-top: 4px;
-    min-height: 16px;
-  }
+  .footer-note{ text-align:center; color: var(--text-faint); font-size: 11.5px; margin-top: 40px; }
 </style>
 </head>
 <body>
-<div class="app">
+<div class="app" id="app">
 
-  <input type="text" class="date-field" id="dateField" placeholder="Day, Date...">
+  <div class="topbar">
+    <button class="backbtn" id="backBtn" onclick="goBack()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      الرجوع
+    </button>
+    <div class="crumb" id="crumb"></div>
+  </div>
 
-  <!-- Plan / Do / Review -->
-  <div class="section">
-    <div class="pdr-row">
-      <button class="pdr-btn" id="planBtn">Plan</button>
-      <button class="pdr-btn" id="doBtn">Do</button>
-      <button class="pdr-btn" id="reviewBtn">Review</button>
+  <!-- HOME -->
+  <section class="screen active" id="screen-home">
+    <div class="home-hero">
+      <h1>قد أفلح</h1>
     </div>
-  </div>
-
-  <!-- Section 1: status buttons -->
-  <div class="section">
-    <div class="status-row" id="statusRow"></div>
-  </div>
-
-  <!-- Section 2 -->
-  <div class="section">
-    <div class="section-title">The German Dentist</div>
-    <div id="germanDentist"></div>
-  </div>
-
-  <!-- Section 3 -->
-  <div class="section">
-    <div class="section-title">The Best of All</div>
-    <div class="two-col">
-      <div class="sub-section">
-        <div id="bestOfAllA"></div>
+    <div class="home-list">
+      <div class="home-btn ready" onclick="goIntro()">
+        <div><div class="label">صفقات رابحة</div></div>
+        <div class="chev">‹</div>
       </div>
-      <div class="sub-section">
-        <div id="bestOfAllB"></div>
+      <div class="home-btn soon">
+        <div><div class="label">— — — —</div></div>
+        <div class="badge">قريبًا</div>
+      </div>
+      <div class="home-btn soon">
+        <div><div class="label">— — — —</div></div>
+        <div class="badge">قريبًا</div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- Section 4 -->
-  <div class="section">
-    <div class="section-title">Health</div>
-    <div id="health"></div>
-  </div>
 
-  <!-- Section 5: chess -->
-  <div class="section">
-    <button class="chess-btn" id="chessBtn">Chess</button>
-  </div>
-
-  <!-- Section 6 -->
-  <div class="section">
-    <div class="section-title">Other Tasks</div>
-    <div id="otherTasks"></div>
-  </div>
-
-  <button class="reset-btn" id="resetBtn">Reset Everything</button>
-  <div class="save-note" id="saveNote"></div>
-</div>
-
-<div class="modal-overlay" id="modalOverlay">
-  <div class="modal">
-    <p>Reset all tasks and inputs? This can't be undone.</p>
-    <div class="modal-actions">
-      <button class="modal-cancel" id="modalCancel">Cancel</button>
-      <button class="modal-confirm" id="modalConfirm">Reset</button>
+  <section class="screen" id="screen-intro">
+    <div class="title-block"><h2>صفقات رابحة</h2></div>
+    <div class="intro-card">
+      <div class="line">مش لازم تعمل كل دول</div>
+      <div class="line"> دي فضائل وما يوصل لها</div>
+      <div class="line">وانتا شوف حابب ايه من الفضل والثواب</div>
+      <div class="line">وشوف الطريق الاقرب والأسهل ليك</div>
+      <div class="line">(كذا عبادة بيوصلوا لنفس الفضل)</div>
     </div>
-  </div>
-</div>
+    <button class="cta" onclick="goLevel1()">يلا نبدأ</button>
+  </section>
 
-<div class="modal-overlay" id="infoOverlay">
-  <div class="modal info-modal">
-    <h3 id="infoTitle"></h3>
-    <p id="infoText"></p>
-    <button class="modal-ok" id="infoOk">OK</button>
-  </div>
+  <!-- LEVEL 1: فضائل -->
+  <section class="screen" id="screen-l1">
+    <div class="question">تحب ايه يكون من نصيبك من دول</div>
+    <div class="list1" id="list1"></div>
+  </section>
+
+  <!-- LEVEL 2: اعمال -->
+  <section class="screen" id="screen-l2">
+    <div class="chosen-pill" id="pillL1"></div>
+    <div class="question" style="margin-top:18px;">اختار حاجة سهلة أو بتحبها من الأعمال دي</div>
+    <div class="list2" id="list2"></div>
+  </section>
+
+  <!-- LEVEL 3: مصدر -->
+  <section class="screen" id="screen-l3">
+    <div class="chosen-trail" id="trailL3"></div>
+    <div id="sourcesWrap"></div>
+    <div class="end-actions">
+      <button onclick="goLevel1()">فضل تاني</button>
+      <button class="primary" onclick="goHome()">الرئيسية</button>
+    </div>
+  </section>
+
 </div>
 
 <script>
-const STORAGE_KEY = 'todo-app-state-v1';
+// ---------- DATA ----------
+// Structure mirrors the document exactly: فضيلة -> عمل (قد يكون بدون اسم منفصل) -> مصدر (قد يكون أكثر من مصدر واحد)
+const DATA = [
+{ f:"الرحمة من الله و ان يغفر الله لي ذنبي", amal:[
+  {n:"الصلاة على النبي", src:[
+    {t:"عن أبي هريرة رضي الله عنه أن رسول الله صلى الله عليه وسلم قال: «مَن صلَّى عليَّ واحدةً صلَّى اللهُ عليه عَشرًا»", c:"أخرجه مسلم"},
+    {t:"عن أنس بن مالك قال: حدثنا بريد بن أبي مريم قال قال رسول الله صلى الله عليه وسلم: «مَن صلَّى عليَّ صلاةً واحدةً، صلَّى اللهُ عليه عَشرَ صلواتٍ، وحُطَّتْ عنه عَشرُ خطيئاتٍ، ورُفِعَتْ له عَشرُ درجاتٍ»", c:"النسائي"}
+  ]},
+  {n:"اسامح الناس", src:[
+    {t:"قال الله تعالى: (وَلْيَعْفُوا وَلْيَصْفَحُوا أَلَا تُحِبُّونَ أَنْ يَغْفِرَ اللَّهُ لَكُمْ وَاللَّهُ غَفُورٌ رَحِيمٌ) (22)", c:"سورة النور"}
+  ]},
+  {n:"تلاوة كتاب الله ومجالس العلم في المسجد", src:[
+    {t:"عن أبي هريرة، قال: قال رسول الله صلى الله عليه وسلم: «ما جلَس قومٌ في مسجدٍ من مساجدِ اللهِ، يتلونَ كتابَ اللهِ، ويتدارَسونَه بينَهم، إلا نزلَتْ عليهمُ السَّكينةُ، وغَشِيَتْهمُ الرَّحمةُ، وحفَّتْهمُ الملائكةُ، وذكَرَهمُ اللهُ فيمَن عندَه»", c:""}
+  ]},
+  {n:"صلة الرحم", src:[
+    {t:"عن عبدالله بن عمرو قال: قال رسول الله صلى الله عليه وسلم: «الرَّاحِمونَ يرحَمُهمُ الرَّحمنُ، ارحَمُوا مَن في الأرضِ يرحَمْكُم مَن في السَّماءِ، الرَّحِمُ شِجْنَةٌ مِنَ الرَّحمنِ، فمَن وصَلَها وصَلَه اللهُ، ومَن قطَعَها قطَعَه اللهُ»", c:"الترمذي"}
+  ]},
+  {n:"ان ارحم الناس", src:[
+    {t:"عن عبدالله بن عمرو قال: قال رسول الله صلى الله عليه وسلم: «الرَّاحِمونَ يرحَمُهمُ الرَّحمنُ، ارحَمُوا مَن في الأرضِ يرحَمْكُم مَن في السَّماءِ، الرَّحِمُ شِجْنَةٌ مِنَ الرَّحمنِ، فمَن وصَلَها وصَلَه اللهُ، ومَن قطَعَها قطَعَه اللهُ»", c:"الترمذي"}
+  ]},
+  {n:"السماحة في المعاملة", src:[
+    {t:"عن جابر بن عبدالله رضي الله عنهما أن رسول الله صلى الله عليه وسلم قال: «رَحِمَ اللهُ رجُلًا سَمْحًا إذا باعَ، وإذا اشترَى، وإذا اقتَضَى»", c:"أخرجه البخاري"}
+  ]},
+  {n:"الاستغفار", src:[
+    {t:"عن أبي هريرة رضي الله عنه قال: قال رسول الله صلى الله عليه وسلم: «والَّذي نفْسي بيَدِه، لو لم تُذنِبوا لذَهَبَ اللهُ بكم، ولجاءَ بقومٍ يُذنِبونَ فيَستَغفِرونَ اللهَ فيَغفِرُ لهم»", c:"أخرجه مسلم"}
+  ]},
+  {n:"التيسير عن المعسر", src:[
+    {t:"عن عبيدالله بن عبدالله عن أبي هريرة رضي الله عنه عن النبي صلى الله عليه وسلم قال: «كان تاجرٌ يُدايِنُ النَّاسَ، فإذا رأى مُعسِرًا قال لفتيانِه: تجاوَزوا عنه، لعلَّ اللهَ أن يتجاوَزَ عنَّا، فتجاوَزَ اللهُ عنه»", c:"البخاري"}
+  ]},
+  {n:"دعاء خاص عند الأذان", src:[
+    {t:"عن سعد بن أبي وقاص رضي الله عنهما عن رسول الله صلى الله عليه وسلم أنه قال: «مَن قال حينَ يَسمَعُ المؤذِّنَ: أشهَدُ أن لا إلَه إلَّا اللهُ وحدَه لا شريكَ له، وأنَّ محمَّدًا عبدُه ورسولُه، رضيتُ باللهِ ربًّا، وبمحمَّدٍ رسولًا، وبالإسلامِ دينًا، غُفِرَ له ذنبُه»", c:"أخرجه مسلم"}
+  ]},
+  {n:"الوضوء", src:[
+    {t:"عن أبي هريرة، أن رسول الله صلى الله عليه وسلم قال: «إذا توضَّأَ العبدُ المسلمُ -أو المؤمنُ- فغسَل وجهَه، خرَجَتْ مِن وجهِه كلُّ خطيئةٍ نظَر إليها بعينَيه مع الماءِ -أو مع آخِرِ قطرِ الماءِ- فإذا غسَل يدَيه، خرَجَتْ مِن يدَيه كلُّ خطيئةٍ بطَشَتْها يداه مع الماءِ -أو مع آخِرِ قطرِ الماءِ- حتى يخرُجَ نقيًّا مِنَ الذُّنوبِ»", c:""}
+  ]},
+  {n:"ان اذكر الله", src:[
+    {t:"عن أبي هريرة رضي الله عنه قال: قال النبي صلى الله عليه وسلم: «يقولُ اللهُ تعالى: أنا عندَ ظنِّ عبدي بي، وأنا معه إذا ذكَرَني، فإن ذكَرَني في نفْسِه ذكَرْتُه في نفْسي، وإن ذكَرَني في مَلَإٍ ذكَرْتُه في مَلَإٍ خيرٍ منهم، وإن تقرَّبَ إليَّ بشِبرٍ تقرَّبْتُ إليه ذِراعًا، وإن تقرَّبَ إليَّ ذِراعًا تقرَّبْتُ إليه باعًا، وإن أتاني يمشي أتَيْتُه هَرْوَلةً»", c:"متفق عليه"}
+  ]},
+  {n:"الصلاة", src:[
+    {t:"عن أبي هريرة رضي الله عنه أن رسول الله صلى الله عليه وسلم قال: «أرأيتُم لو أنَّ نهرًا ببابِ أحدِكم يغتسِلُ منه كلَّ يومٍ خمسَ مرَّاتٍ، هل يبقى مِن دَرَنِه شيءٌ؟». قالوا: لا يبقى مِن دَرَنِه شيءٌ. قال: «فذلكَ مَثَلُ الصَّلواتِ الخمسِ، يَمحو اللهُ بهنَّ الخطايا»", c:"متفق عليه"}
+  ]}
+]},
 
-function defaultState() {
-  return {
-    date: '',
-    statusButtons: [0,0,0,0,0], // 0=gray,1=green,2=red
-    chess: 0,
-    germanDentist: [
-      {text:'', checked:false},
-      {text:'', checked:false},
-      {text:'', checked:false},
-      {text:'', checked:false}
-    ],
-    bestOfAllA: [
-      {text:'', checked:false},
-      {text:'', checked:false},
-      {text:'', checked:false}
-    ],
-    bestOfAllB: [
-      {text:'', checked:false},
-      {text:'', checked:false},
-      {text:'', checked:false}
-    ],
-    health: [
-      {text:'', checked:false},
-      {text:'', checked:false},
-      {text:'', checked:false}
-    ],
-    otherTasks: [
-      {text:'', checked:false},
-      {text:'', checked:false},
-      {text:'', checked:false},
-      {text:'', checked:false}
-    ]
-  };
+{ f:"ادخل من أي ابواب الجنة شئت", amal:[
+  {n:"الوضوء و ذكر خاص", src:[
+    {t:"عن عمر رضي الله عنه قال: قال رسول الله صلى الله عليه وسلم: «ما مِنكم مِن أحَدٍ يتوضَّأُ فيُبلِغُ -أو يُسبِغُ- الوُضوءَ، ثم يقولُ: أشهَدُ أن لا إلَه إلَّا اللهُ وأنَّ محمَّدًا عبدُ اللهِ ورسولُه، إلَّا فُتِحَتْ له أبوابُ الجنَّةِ الثَّمانيةُ، يدخُلُ مِن أيِّها شاءَ»", c:"أخرجه مسلم"}
+  ]}
+]},
+
+{ f:"ان يصل سلامي للنبي عليه الصلاة والسلام", amal:[
+  {n:"الصلاة على النبي", src:[
+    {t:"عن ابن مسعود رضي الله عنه قال: قال رسول الله صلى الله عليه وسلم: «إنَّ للهِ ملائكةً سَيَّاحينَ في الأرضِ، يُبلِّغوني مِن أمَّتي السَّلامَ»", c:"أخرجه أحمد والنسائي"}
+  ]}
+]},
+
+{ f:"ان يكفيني الله همي ويغفر لي ذنبي ومن كل هم فرج و يطمئن قلبي", amal:[
+  {n:"ان اذكر الله", src:[
+    {t:"قال الله تعالى: (الَّذِينَ آمَنُوا وَتَطْمَئِنُّ قُلُوبُهُمْ بِذِكْرِ اللَّهِ أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ) (28)", c:"سورة الرعد: 28"},
+    {t:"عن أبي موسى رضي الله عنه قال: قال النبي صلى الله عليه وسلم: «مَثَلُ الَّذي يذكُرُ ربَّه والَّذي لا يذكُرُ ربَّه، مَثَلُ الحيِّ والميِّتِ»", c:"أخرجه البخاري"}
+  ]},
+  {n:"دعاء يسير", src:[
+    {t:"قال الله تعالى: (الَّذِينَ قَالَ لَهُمُ النَّاسُ إِنَّ النَّاسَ قَدْ جَمَعُوا لَكُمْ فَاخْشَوْهُمْ فَزَادَهُمْ إِيمَانًا وَقَالُوا حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ (173) فَانْقَلَبُوا بِنِعْمَةٍ مِنَ اللَّهِ وَفَضْلٍ لَمْ يَمْسَسْهُمْ سُوءٌ وَاتَّبَعُوا رِضْوَانَ اللَّهِ وَاللَّهُ ذُو فَضْلٍ عَظِيمٍ (174))", c:"سورة آل عمران"}
+  ]},
+  {n:"الصلاة على النبي", src:[
+    {t:"عن الطفيل بن أبي بن كعب عن أبيه، قال للنبي صلى الله عليه وسلم: كم أجعَلُ لك مِن صلاتي؟ قال: «ما شئتَ». قال: الثُّلُثَ؟ قال: «ما شئتَ، وإن زِدتَ فهو أفضلُ». قال: النِّصفَ؟ قال: «ما شئتَ، وإن زِدتَ فهو أفضلُ». قال: فكلَّها. قال: «إذًا يَكفيكَ اللهُ همَّكَ، ويَغفِرْ لكَ ذنبَكَ»", c:"أخرجه البيهقي"}
+  ]},
+  {n:"استغفر الله", src:[
+    {t:"عن ابن عباس رضي الله عنهما، أنه حدَّثه، قال: قال رسول الله صلى الله عليه وسلم: «مَن لزِمَ الِاستغفارَ، جعَل اللهُ له مِن كلِّ ضيقٍ مَخرَجًا، ومِن كلِّ همٍّ فرَجًا، ورزَقَه مِن حيثُ لا يَحتسِبُ»", c:"أبو داود"}
+  ]},
+  {n:"القران", src:[
+    {t:"قال الله تعالى: (يَا أَيُّهَا النَّاسُ قَدْ جَاءَتْكُمْ مَوْعِظَةٌ مِنْ رَبِّكُمْ وَشِفَاءٌ لِمَا فِي الصُّدُورِ وَهُدًى وَرَحْمَةٌ لِلْمُؤْمِنِينَ (57) قُلْ بِفَضْلِ اللَّهِ وَبِرَحْمَتِهِ فَبِذَلِكَ فَلْيَفْرَحُوا هُوَ خَيْرٌ مِمَّا يَجْمَعُونَ (58))", c:"سورة يونس"}
+  ]}
+]},
+
+{ f:"الايمان بالله و القضاء و القدر", amal:[
+  {n:"الايمان بالله و القضاء و القدر", src:[
+    {t:"قال الله تعالى: (مَا أَصَابَ مِنْ مُصِيبَةٍ إِلَّا بِإِذْنِ اللَّهِ وَمَنْ يُؤْمِنْ بِاللَّهِ يَهْدِ قَلْبَهُ وَاللَّهُ بِكُلِّ شَيْءٍ عَلِيمٌ) (11)", c:"سورة التغابن: 11"}
+  ]}
+]},
+
+{ f:"التفريج عن مسلم", amal:[
+  {n:"التفريج عن مسلم", src:[
+    {t:"عن عبدالله بن عمرو قال: قال رسول الله صلى الله عليه وسلم: «الرَّاحِمونَ يرحَمُهمُ الرَّحمنُ، ارحَمُوا مَن في الأرضِ يرحَمْكُم مَن في السَّماءِ، الرَّحِمُ شِجْنَةٌ مِنَ الرَّحمنِ، فمَن وصَلَها وصَلَه اللهُ، ومَن قطَعَها قطَعَه اللهُ»", c:"الترمذي"}
+  ]}
+]},
+
+{ f:"ان يهديني الله", amal:[
+  {n:"اجاهد نفسي", src:[
+    {t:"قال الله تعالى: (وَالَّذِينَ جَاهَدُوا فِينَا لَنَهْدِيَنَّهُمْ سُبُلَنَا وَإِنَّ اللَّهَ لَمَعَ الْمُحْسِنِينَ) (69)", c:"سورة العنكبوت"}
+  ]},
+  {n:"القران", src:[
+    {t:"قال الله تعالى: (يَا أَيُّهَا النَّاسُ قَدْ جَاءَتْكُمْ مَوْعِظَةٌ مِنْ رَبِّكُمْ وَشِفَاءٌ لِمَا فِي الصُّدُورِ وَهُدًى وَرَحْمَةٌ لِلْمُؤْمِنِينَ (57) قُلْ بِفَضْلِ اللَّهِ وَبِرَحْمَتِهِ فَبِذَلِكَ فَلْيَفْرَحُوا هُوَ خَيْرٌ مِمَّا يَجْمَعُونَ (58))", c:"سورة يونس"},
+    {t:"قال الله تعالى: (قَدْ جَاءَكُمْ مِنَ اللَّهِ نُورٌ وَكِتَابٌ مُبِينٌ (15) يَهْدِي بِهِ اللَّهُ مَنِ اتَّبَعَ رِضْوَانَهُ سُبُلَ السَّلَامِ وَيُخْرِجُهُمْ مِنَ الظُّلُمَاتِ إِلَى النُّورِ بِإِذْنِهِ وَيَهْدِيهِمْ إِلَى صِرَاطٍ مُسْتَقِيمٍ)", c:"سورة المائدة"}
+  ]}
+]},
+
+{ f:"ان اكون ربانيا", amal:[
+  {n:"التعلم و التعليم للدين", src:[
+    {t:"قال الله تعالى: (وَلَكِنْ كُونُوا رَبَّانِيِّينَ بِمَا كُنْتُمْ تُعَلِّمُونَ الْكِتَابَ وَبِمَا كُنْتُمْ تَدْرُسُونَ)", c:"سورة آل عمران"}
+  ]}
+]},
+
+{ f:"ما هو خير لي من متاع الدنيا", amal:[
+  {n:"ان يهدي الله بي احدا", src:[
+    {t:"«لَأَنْ يَهدِيَ اللهُ بكَ رجُلًا واحِدًا، خيرٌ لكَ مِن أنْ يكونَ لكَ حُمرُ النَّعَمِ»", c:""}
+  ]},
+  {n:"القران", src:[
+    {t:"قال الله تعالى: (يَا أَيُّهَا النَّاسُ قَدْ جَاءَتْكُمْ مَوْعِظَةٌ مِنْ رَبِّكُمْ وَشِفَاءٌ لِمَا فِي الصُّدُورِ وَهُدًى وَرَحْمَةٌ لِلْمُؤْمِنِينَ (57) قُلْ بِفَضْلِ اللَّهِ وَبِرَحْمَتِهِ فَبِذَلِكَ فَلْيَفْرَحُوا هُوَ خَيْرٌ مِمَّا يَجْمَعُونَ (58))", c:"سورة يونس"}
+  ]}
+]},
+
+{ f:"ان تضع الملائكة رضا لي و ان يستغفر لي من في السماوات و الارض", amal:[
+  {n:"ان اطلب العلم", src:[
+    {t:"عن قيس بن كثير عن أبي الدرداء رضي الله عنه، عن رسول الله صلى الله عليه وسلم أنه قال: «مَن سلَكَ طريقًا يطلُبُ فيه عِلمًا، سلَكَ اللهُ به طريقًا إلى الجنَّةِ، وإنَّ الملائكةَ لتضَعُ أجنِحتَها رِضًا لطالبِ العلمِ، وإنَّ العالِمَ ليَستغفِرُ له مَن في السَّماواتِ ومَن في الأرضِ، حتى الحيتانُ في الماءِ، وفضلُ العالِمِ على العابدِ كفضلِ القمرِ على سائرِ الكواكبِ، وإنَّ العلماءَ ورَثةُ الأنبياءِ، إنَّ الأنبياءَ لم يُوَرِّثوا دينارًا ولا درهمًا، وإنَّما وَرَّثوا العلمَ، فمَن أخَذَ به أخَذَ بحظٍّ وافرٍ»", c:"أخرجه أحمد"}
+  ]}
+]},
+
+{ f:"ان يرفعني الله درجات", amal:[
+  {n:"ان اطلب العلم", src:[
+    {t:"قال الله تعالى: (يَرْفَعِ اللَّهُ الَّذِينَ آمَنُوا مِنْكُمْ وَالَّذِينَ أُوتُوا الْعِلْمَ دَرَجَاتٍ)", c:"سورة المجادلة"}
+  ]},
+  {n:"الوضوء و الصلاة في المسجد", src:[
+    {t:"عن أبي هريرة رضي الله عنه أن رسول الله صلى الله عليه وسلم قال: «ألَا أدُلُّكم على ما يمحو اللهُ به الخطايا، ويرفَعُ به الدَّرَجاتِ؟». قالوا: بلى، يا رسولَ اللهِ! قال: «إسباغُ الوضوءِ على المكارِهِ، وكثرةُ الخُطا إلى المساجدِ، وانتظارُ الصَّلاةِ بعدَ الصَّلاةِ، فذلكم الرِّباطُ»", c:""}
+  ]},
+  {n:"الصلاة على النبي", src:[
+    {t:"عن أنس بن مالك قال: حدثنا بريد بن أبي مريم قال قال رسول الله صلى الله عليه وسلم: «مَن صلَّى عليَّ صلاةً واحدةً، صلَّى اللهُ عليه عَشرَ صلواتٍ، وحُطَّتْ عنه عَشرُ خطيئاتٍ، ورُفِعَتْ له عَشرُ درجاتٍ»", c:"النسائي"}
+  ]},
+  {n:"القران", src:[
+    {t:"عن أبي هريرة رضي الله عنه عن النبي صلى الله عليه وسلم قال: «يَجيءُ القرآنُ يومَ القيامةِ فيقولُ: يا ربِّ حَلِّه، فيُلبَسُ تاجَ الكرامةِ، ثم يقولُ: يا ربِّ زِدْه، فيُلبَسُ حُلَّةَ الكرامةِ، ثم يقولُ: يا ربِّ ارضَ عنه، فيَرضى عنه، فيُقالُ له: اقرَأْ وارقَ، وتُزادُ بكلِّ آيةٍ حسنةً»", c:"الترمذي"},
+    {t:"عن عائشة رضي الله عنها قالت: قال رسول الله صلى الله عليه وسلم: «الماهرُ بالقرآنِ مع السَّفَرةِ الكرامِ البَرَرةِ، والَّذي يقرأُ القرآنَ ويتَتَعتَعُ فيه، وهو عليه شاقٌّ، له أجرانِ»", c:"متفق عليه"}
+  ]},
+  {n:"الصلاة", src:[
+    {t:"عن أبي هريرة رضي الله عنه عن النبي صلى الله عليه وسلم قال: «صلاةُ الجميعِ تزيدُ على صلاتِه في بيتِه وصلاتِه في سوقِه خمسًا وعشرينَ درجةً، فإنَّ أحدَكم إذا توضَّأَ فأحسَنَ، وأتى المسجدَ لا يريدُ إلا الصَّلاةَ، لم يخطُ خطوةً إلا رُفِعَ له بها درجةٌ، وحُطَّ عنه بها خطيئةٌ، حتى يدخُلَ المسجدَ، وإذا دخَل المسجدَ كان في صلاةٍ ما كانتْ تحبِسُه، وتُصلِّي عليه الملائكةُ ما دام في مجلِسِه الَّذي يُصلِّي فيه: اللهمَّ اغفِرْ له، اللهمَّ ارحَمْه، ما لم يُحدِثْ فيه»", c:"متفق عليه"}
+  ]},
+  {n:"قيام الليل", src:[
+    {t:"قال الله تعالى: (وَمِنَ اللَّيْلِ فَتَهَجَّدْ بِهِ نَافِلَةً لَكَ عَسَى أَنْ يَبْعَثَكَ رَبُّكَ مَقَامًا مَحْمُودًا) (79)", c:"سورة الإسراء: 79"}
+  ]}
+]},
+
+{ f:"ان يحرمني الله على النار", amal:[
+  {n:"ان اشهد ان لا اله الا الله و ان محمدا رسول الله", src:[
+    {t:"عن أنس بن مالك رضي الله عنه أن نبي الله صلى الله عليه وسلم، ومعاذ بن جبل رديفُه على الرَّحلِ، قال: «يا معاذُ!» قال: لبَّيكَ رسولَ اللهِ وسعدَيكَ. قال: «يا معاذُ!» قال: لبَّيكَ رسولَ اللهِ وسعدَيكَ (ثلاثًا). قال: «ما مِن عبدٍ يشهَدُ أن لا إلَه إلَّا اللهُ، وأنَّ محمَّدًا عبدُه ورسولُه، إلَّا حرَّمَه اللهُ على النَّارِ». قال: يا رسولَ اللهِ! أفلا أُخبِرُ بها النَّاسَ فيَستبشِروا؟ قال: «إذًا يتَّكِلوا». فأخبَرَ بها معاذٌ عند موتِه، تأثُّمًا", c:"متفق عليه"}
+  ]}
+]},
+
+{ f:"ان يباعد الله بيني وبين النار و افرح حين القى الله", amal:[
+  {n:"اصوم يوما تطوعا", src:[
+    {t:"عن أبي هريرة رضي الله عنه قال: قال رسول الله صلى الله عليه وسلم: «قال اللهُ: كلُّ عملِ ابنِ آدمَ له إلَّا الصِّيامَ، فإنَّه لي وأنا أجزي به، والصِّيامُ جُنَّةٌ، وإذا كان يومُ صومِ أحدِكم فلا يرفُثْ ولا يصخَبْ، فإن سابَّه أحدٌ أو قاتَله فليَقُلْ: إنِّي امرؤٌ صائمٌ، والَّذي نفْسُ محمَّدٍ بيَدِه، لَخُلوفُ فمِ الصَّائمِ أطيَبُ عندَ اللهِ مِن ريحِ المِسكِ، للصَّائمِ فرحَتانِ يفرَحُهما: إذا أفطَر فرِحَ، وإذا لقيَ ربَّه فرِحَ بصومِه»", c:"متفق عليه"},
+    {t:"«فصُمْ وأفطِرْ، ونَمْ وقُمْ، وصُمْ مِنَ الشَّهرِ ثلاثةَ أيَّامٍ، فإنَّ الحسنةَ بعشرِ أمثالِها، وذلك مِثلُ صيامِ الدَّهرِ»", c:""},
+    {t:"عن أبي هريرة رضي الله عنه قال: أوصاني خليلي بثلاثٍ: «صيامِ ثلاثةِ أيَّامٍ مِن كلِّ شهرٍ، وركعتَي الضُّحى، وأنْ أُوتِرَ قبلَ أن أنامَ»", c:"متفق عليه"},
+    {t:"عن أبي سعيد الخدري رضي الله عنه قال: سمعتُ النبي صلى الله عليه وسلم يقول: «مَن صامَ يومًا في سبيلِ اللهِ، بعَّدَ اللهُ وجهَه عنِ النَّارِ سبعينَ خريفًا»", c:"متفق عليه"},
+    {t:"عن عقبة بن عامر عن رسول الله صلى الله عليه وسلم قال: «مَن صامَ يومًا في سبيلِ اللهِ عزَّ وجلَّ، باعَدَ اللهُ منه جهنَّمَ مسيرةَ مائةِ عامٍ»", c:"النسائي"},
+    {t:"عن أبي أمامة عن نبي الله صلى الله عليه وسلم قال: «مَن صامَ يومًا في سبيلِ اللهِ، باعدَه اللهُ مِن جهنَّمَ مائةَ عامٍ، رَكْضَ الفرسِ الجَوادِ المُضَمَّرِ»", c:"الطبراني"},
+    {t:"عن أبي أمامة عن نبي الله صلى الله عليه وسلم قال: «مَن صامَ يومًا في سبيلِ اللهِ، جعَل اللهُ بينَه وبينَ النَّارِ خندقًا كما بينَ السَّماءِ والأرضِ»", c:"الطبراني"}
+  ]}
+]},
+
+{ f:"نزلا في الجنة", amal:[
+  {n:"الصلاة في المسجد", src:[
+    {t:"عن أبي هريرة رضي الله عنه عن النبي صلى الله عليه وسلم قال: «مَن غدا إلى المسجدِ أو راحَ، أعدَّ اللهُ له نُزُلَه مِنَ الجنَّةِ، كلَّما غدا أو راحَ»", c:"متفق عليه"}
+  ]},
+  {n:"ذكر يسير لأكون من اهل الجنة", src:[
+    {t:"عن شداد بن أوس رضي الله عنه عن النبي صلى الله عليه وسلم قال: «سيِّدُ الاستغفارِ أن تقولَ: اللهمَّ أنتَ ربِّي لا إلَه إلَّا أنتَ، خلَقْتَني وأنا عبدُكَ، وأنا على عهدِكَ ووعدِكَ ما استطعْتُ، أعوذُ بكَ مِن شرِّ ما صنعْتُ، أبوءُ لكَ بنِعمتِكَ عليَّ، وأبوءُ بذنبي فاغفِرْ لي، فإنَّه لا يغفِرُ الذُّنوبَ إلَّا أنتَ». قال: «ومَن قالَها مِنَ النَّهارِ مُوقِنًا بها، فماتَ مِن يومِه قبلَ أن يُمسيَ، فهو مِن أهلِ الجنَّةِ، ومَن قالَها مِنَ اللَّيلِ وهو مُوقِنٌ بها، فماتَ قبلَ أن يُصبِحَ، فهو مِن أهلِ الجنَّةِ»", c:"أخرجه البخاري"}
+  ]}
+]},
+
+{ f:"اجر كقيام الليل كله", amal:[
+  {n:"صلاة العشاء والفجر في جماعة", src:[
+    {t:"عن أبي هريرة رضي الله عنه عن النبي صلى الله عليه وسلم قال: «مَن غدا إلى المسجدِ أو راحَ، أعدَّ اللهُ له نُزُلَه مِنَ الجنَّةِ، كلَّما غدا أو راحَ»", c:"متفق عليه"}
+  ]}
+]},
+
+{ f:"ان اجمع خير الدنيا والاخرة", amal:[
+  {n:"دعاء وصى به النبي صلى الله عليه و سلم", src:[
+    {t:"عن طارق بن أشيم رضي الله عنه أنه سمع النبي صلى الله عليه وسلم، وأتاه رجل فقال: يا رسول الله! كيف أقول حين أسأل ربي؟ قال: «قُلِ: اللهمَّ اغفِرْ لي وارحَمْني وعافِني وارزُقْني، فإنَّ هؤلاءِ تجمَعُ لكَ دُنياكَ وآخرتَكَ»", c:"أخرجه مسلم"}
+  ]},
+  {n:"ان اذكر الله", src:[
+    {t:"عن أبي هريرة رضي الله عنه قال: قال رسول الله صلى الله عليه وسلم: «لَأنْ أقولَ: سُبحانَ اللهِ، والحمدُ للهِ، ولا إلَه إلَّا اللهُ، واللهُ أكبرُ، أحبُّ إليَّ ممَّا طلَعَتْ عليه الشَّمسُ»", c:"أخرجه مسلم"}
+  ]}
+]},
+
+{ f:"قراءة وتعلم القرءان", amal:[
+  {n:"قراءة وتعلم القرءان", src:[
+    {t:"عن عقبة بن عامر رضي الله عنه قال: خرج رسول الله صلى الله عليه وسلم ونحن في الصُّفَّةِ، فقال: «أيُّكم يُحِبُّ أن يغدوَ كلَّ يومٍ إلى بُطحانَ أو إلى العَقيقِ، فيأتيَ منه بناقتَينِ كوماوَينِ، في غيرِ إثمٍ ولا قطعِ رَحِمٍ؟». فقلنا: يا رسولَ اللهِ! نُحِبُّ ذلك. قال: «أفلا يغدو أحدُكم إلى المسجدِ، فيَعلَمَ أو يقرأَ آيتَينِ مِن كتابِ اللهِ عزَّ وجلَّ، خيرٌ له مِن ناقتَينِ، وثلاثٌ خيرٌ له مِن ثلاثٍ، وأربعٌ خيرٌ له مِن أربعٍ، ومِن أعدادِهنَّ مِنَ الإبلِ؟»", c:"أخرجه مسلم"}
+  ]}
+]},
+
+{ f:"رزق وفير و اموال وبنين وجنات و انهار", amal:[
+  {n:"استغفر الله", src:[
+    {t:"قال الله تعالى: (فَقُلْتُ اسْتَغْفِرُوا رَبَّكُمْ إِنَّهُ كَانَ غَفَّارًا (10) يُرْسِلِ السَّمَاءَ عَلَيْكُمْ مِدْرَارًا (11) وَيُمْدِدْكُمْ بِأَمْوَالٍ وَبَنِينَ وَيَجْعَلْ لَكُمْ جَنَّاتٍ وَيَجْعَلْ لَكُمْ أَنْهَارًا (12))", c:"سورة نوح"}
+  ]},
+  {n:"صلة الأرحام", src:[
+    {t:"عن أنس بن مالك رضي الله عنه أن رسول الله صلى الله عليه وسلم قال: «مَن أحبَّ أن يُبسَطَ له في رزقِه، ويُنسَأَ له في أثرِه، فليَصِلْ رحِمَه»", c:"متفق عليه"},
+    {t:"عن عبدالله بن عمرو رضي الله عنه عن النبي صلى الله عليه وسلم قال: «ليس الواصلُ بالمُكافِئِ، ولكنَّ الواصلَ الَّذي إذا قُطِعَتْ رحِمُه وصَلَها»", c:"أخرجه البخاري"}
+  ]}
+]},
+
+{ f:"ان انال الشفاعة يوم القيامة", amal:[
+  {n:"أسأل الوسيلة للنبي عليه الصلاة و السلام", src:[
+    {t:"عن جابر بن عبدالله رضي الله عنهما أن رسول الله صلى الله عليه وسلم قال: «مَن قال حينَ يسمَعُ النِّداءَ: اللهمَّ ربَّ هذه الدَّعوةِ التَّامَّةِ، والصَّلاةِ القائمةِ، آتِ محمَّدًا الوَسيلةَ والفضيلةَ، وابعَثْه مَقامًا محمودًا الَّذي وعدْتَه، حلَّتْ له شفاعَتي يومَ القيامةِ»", c:"أخرجه البخاري"}
+  ]},
+  {n:"ان اقرأ القران", src:[
+    {t:"عن أبي أمامة الباهلي رضي الله عنه قال: سمعتُ رسول الله صلى الله عليه وسلم يقول: «اقرَؤوا القرآنَ، فإنَّه يأتي يومَ القيامةِ شفيعًا لأصحابِه، اقرَؤوا الزَّهراوَينِ: البقرةَ، وسورةَ آلِ عِمرانَ، فإنَّهما تأتيانِ يومَ القيامةِ كأنَّهما غَمامتانِ، أو كأنَّهما غَيايتانِ، أو كأنَّهما فِرقانِ مِن طيرٍ صَوافَّ، تُحاجَّانِ عن أصحابِهما، اقرَؤوا سورةَ البقرةِ، فإنَّ أخذَها بركةٌ، وتركَها حسرةٌ، ولا تستطيعُها البَطَلةُ»", c:"أخرجه مسلم"}
+  ]}
+]},
+
+{ f:"ما يساوي عشر رقاب ومائة حسنة ويغفر لي مائة سيئة ويكون لي حرز من الشيطان", amal:[
+  {n:"ذكر خاص", src:[
+    {t:"عن أبي هريرة رضي الله عنه قال: قال رسول الله صلى الله عليه وسلم: «مَن قال: لا إلَه إلَّا اللهُ وحدَه لا شريكَ له، له المُلكُ وله الحمدُ، وهو على كلِّ شيءٍ قديرٌ، في يومٍ مائةَ مرَّةٍ، كانتْ له عَدلَ عَشرِ رِقابٍ، وكُتِبَتْ له مائةُ حسنةٍ، ومُحِيَتْ عنه مائةُ سيِّئةٍ، وكانتْ له حِرزًا مِنَ الشَّيطانِ يومَه ذلك حتى يُمسيَ، ولم يأتِ أحدٌ بأفضلَ ممَّا جاءَ به إلَّا أحدٌ عمِلَ أكثرَ مِن ذلك. ومَن قال: سبحانَ اللهِ وبحمدِه، في يومٍ مائةَ مرَّةٍ، حُطَّتْ خطاياه ولو كانتْ مِثلَ زَبَدِ البحرِ»", c:"متفق عليه"}
+  ]}
+]},
+
+{ f:"ان امﻷ الميزان", amal:[
+  {n:"سبحان الله والحمد لله", src:[
+    {t:"عن أبي مالك الأشعري رضي الله عنه قال: قال رسول الله صلى الله عليه وسلم: «الطُّهورُ شَطرُ الإيمانِ، والحمدُ للهِ تملأُ الميزانَ، وسبحانَ اللهِ والحمدُ للهِ تملآنِ -أو تملأُ- ما بينَ السَّماواتِ والأرضِ»", c:"أخرجه مسلم"}
+  ]},
+  {n:"قراءة القران", src:[
+    {t:"عن عبدالله بن مسعود رضي الله عنه قال: قال رسول الله صلى الله عليه وسلم: «مَن قرأَ حرفًا مِن كتابِ اللهِ فله به حسنةٌ، والحسنةُ بعشرِ أمثالِها»", c:"الترمذي"}
+  ]}
+]},
+
+{ f:"كمن اعتق اربعة انفس من ولد اسماعيل", amal:[
+  {n:"ذكر يسير", src:[
+    {t:"عن أبي أيوب الأنصاري رضي الله عنه عن رسول الله صلى الله عليه وسلم قال: «مَن قال: لا إلَه إلَّا اللهُ وحدَه لا شريكَ له، له المُلكُ وله الحمدُ، وهو على كلِّ شيءٍ قديرٌ، عَشرَ مِرارٍ، كان كمَن أعتَقَ أربعةَ أنفُسٍ مِن ولَدِ إسماعيلَ»", c:"أخرجه مسلم"}
+  ]}
+]},
+
+{ f:"مايجعلني اكف عن الفحشاء و المنكر", amal:[
+  {n:"الصلاة", src:[
+    {t:"قال الله تعالى: (اتْلُ مَا أُوحِيَ إِلَيْكَ مِنَ الْكِتَابِ وَأَقِمِ الصَّلَاةَ إِنَّ الصَّلَاةَ تَنْهَى عَنِ الْفَحْشَاءِ وَالْمُنْكَرِ وَلَذِكْرُ اللَّهِ أَكْبَرُ وَاللَّهُ يَعْلَمُ مَا تَصْنَعُونَ) (45)", c:"سورة العنكبوت: 45"}
+  ]},
+  {n:"الذكر", src:[
+    {t:"قال الله تعالى: (اتْلُ مَا أُوحِيَ إِلَيْكَ مِنَ الْكِتَابِ وَأَقِمِ الصَّلَاةَ إِنَّ الصَّلَاةَ تَنْهَى عَنِ الْفَحْشَاءِ وَالْمُنْكَرِ وَلَذِكْرُ اللَّهِ أَكْبَرُ وَاللَّهُ يَعْلَمُ مَا تَصْنَعُونَ) (45)", c:"سورة العنكبوت: 45"}
+  ]},
+  {n:"الصدقة", src:[
+    {t:"قال الله تعالى: (خُذْ مِنْ أَمْوَالِهِمْ صَدَقَةً تُطَهِّرُهُمْ وَتُزَكِّيهِمْ بِهَا وَصَلِّ عَلَيْهِمْ إِنَّ صَلَاتَكَ سَكَنٌ لَهُمْ وَاللَّهُ سَمِيعٌ عَلِيمٌ) (103)", c:"سورة التوبة: 103"}
+  ]}
+]},
+
+{ f:"دعاء مستجاب", amal:[
+  {n:"النوافل والتطوع", src:[
+    {t:"يقولُ اللهُ تباركَ وتعالى: «ما تقرَّبَ إليَّ عبدي بشيءٍ أفضلَ مِن أداءِ ما افترَضْتُ عليه، وما يزالُ عبدي يتقرَّبُ إليَّ بالنَّوافلِ حتى أُحِبَّه، فإذا أحبَبْتُه كنتُ سمْعَه الَّذي يَسمَعُ به، وبصرَه الَّذي يُبصِرُ به، ويدَه الَّتي يبطِشُ بها، ورِجلَه الَّتي يمشي بها، ولئنْ سألَني لَأُعطِيَنَّه، ولئنْ دَعاني لَأُجيبَنَّه، ولئنْ استَعاذَني لَأُعيذَنَّه»", c:""}
+  ]},
+  {n:"الدعاء بين الأذان و الاقامة", src:[
+    {t:"عن أنس بن مالك رضي الله عنه قال: قال رسول الله صلى الله عليه وسلم: «الدُّعاءُ لا يُرَدُّ بينَ الأذانِ والإقامةِ»", c:"أخرجه أبو داود والترمذي"},
+    {t:"قالوا: فماذا نقولُ يا رسولَ اللهِ؟ قال: «سَلوا اللهَ العافيةَ في الدُّنيا والآخرةِ»", c:"الترمذي"}
+  ]}
+]},
+
+{ f:"ان اوفى اجري بغير حساب", amal:[
+  {n:"الصبر", src:[
+    {t:"قال الله تعالى: (إِنَّمَا يُوَفَّى الصَّابِرُونَ أَجْرَهُمْ بِغَيْرِ حِسَابٍ)", c:"سورة الزمر"}
+  ]}
+]},
+
+{ f:"ان أشكر نعم الله", amal:[
+  {n:"صلاة الضحى", src:[
+    {t:"عن أبي ذر رضي الله عنه عن النبي صلى الله عليه وسلم أنه قال: «يُصبِحُ على كلِّ سُلامَى مِن أحدِكم صدقةٌ، فكلُّ تسبيحةٍ صدقةٌ، وكلُّ تحميدةٍ صدقةٌ، وكلُّ تهليلةٍ صدقةٌ، وكلُّ تكبيرةٍ صدقةٌ، وأمرٌ بالمعروفِ صدقةٌ، ونهيٌ عنِ المنكَرِ صدقةٌ، ويُجزئُ مِن ذلك ركعتانِ يركَعُهما مِنَ الضُّحى»", c:"أخرجه مسلم"}
+  ]}
+]},
+
+{ f:"تجارة واستثمار مضاعف", amal:[
+  {n:"الصدقة", src:[
+    {t:"عن أبي هريرة رضي الله عنه قال: قال رسول الله صلى الله عليه وسلم: «مَن تصدَّقَ بعَدلِ تمرةٍ مِن كسْبٍ طيِّبٍ، ولا يقبَلُ اللهُ إلَّا الطَّيِّبَ، وإنَّ اللهَ يتقبَّلُها بيمينِه، ثم يُرَبِّيها لصاحبِه، كما يُرَبِّي أحدُكم فَلُوَّه، حتى تكونَ مِثلَ الجبلِ»", c:"متفق عليه"},
+    {t:"قال الله تعالى: (مَنْ ذَا الَّذِي يُقْرِضُ اللَّهَ قَرْضًا حَسَنًا فَيُضَاعِفَهُ لَهُ أَضْعَافًا كَثِيرَةً وَاللَّهُ يَقْبِضُ وَيَبْسُطُ وَإِلَيْهِ تُرْجَعُونَ) (245)", c:"سورة البقرة"},
+    {t:"قال الله تعالى: (مَثَلُ الَّذِينَ يُنْفِقُونَ أَمْوَالَهُمْ فِي سَبِيلِ اللَّهِ كَمَثَلِ حَبَّةٍ أَنْبَتَتْ سَبْعَ سَنَابِلَ فِي كُلِّ سُنْبُلَةٍ مِائَةُ حَبَّةٍ وَاللَّهُ يُضَاعِفُ لِمَنْ يَشَاءُ وَاللَّهُ وَاسِعٌ عَلِيمٌ) (261)", c:"سورة البقرة: 261"}
+  ]}
+]},
+
+{ f:"ان انال الظل يوم القيامة", amal:[
+  {n:"التيسير في القرض والصدقة", src:[
+    {t:"عن أبي اليسر رضي الله عنه قال: قال رسول الله صلى الله عليه وسلم: «مَن أنظَرَ مُعسِرًا، أو وضَعَ عنه، أظلَّه اللهُ في ظِلِّه»", c:"أخرجه مسلم"},
+    {t:"عن أبي هريرة قال: قال رسول الله صلى الله عليه وسلم: «مَن أنظَرَ مُعسِرًا، أو وضَعَ له، أظلَّه اللهُ يومَ القيامةِ تحتَ ظِلِّ عرشِه، يومَ لا ظِلَّ إلَّا ظِلُّه»", c:"الترمذي"}
+  ]},
+  {n:"قراءة سورتي البقرة و ال عمران", src:[
+    {t:"عن أبي أمامة الباهلي رضي الله عنه قال: سمعتُ رسول الله صلى الله عليه وسلم يقول: «اقرَؤوا القرآنَ، فإنَّه يأتي يومَ القيامةِ شفيعًا لأصحابِه، اقرَؤوا الزَّهراوَينِ: البقرةَ، وسورةَ آلِ عِمرانَ، فإنَّهما تأتيانِ يومَ القيامةِ كأنَّهما غَمامتانِ، أو كأنَّهما غَيايتانِ، أو كأنَّهما فِرقانِ مِن طيرٍ صَوافَّ، تُحاجَّانِ عن أصحابِهما، اقرَؤوا سورةَ البقرةِ، فإنَّ أخذَها بركةٌ، وتركَها حسرةٌ، ولا تستطيعُها البَطَلةُ»", c:"أخرجه مسلم"}
+  ]}
+]},
+
+{ f:"منبر من نور يوم القيامة على يمين الرحمن", amal:[
+  {n:"العدل في الحكم", src:[
+    {t:"عن عبدالله بن عمرو رضي الله عنه قال: قال رسول الله صلى الله عليه وسلم: «إنَّ المُقسِطينَ عندَ اللهِ على منابرَ مِن نورٍ، عن يمينِ الرَّحمنِ عزَّ وجلَّ، وكِلتا يدَيه يمينٌ، الَّذينَ يعدِلونَ في حُكمِهم وأهليهم وما وَلُوا»", c:"أخرجه مسلم"}
+  ]}
+]},
+
+{ f:"خير من الصلاة والصيام و الصدقة", amal:[
+  {n:"الاصلاح بين الناس", src:[
+    {t:"عن أبي الدرداء رضي الله عنه قال: قال رسول الله صلى الله عليه وسلم: «ألَا أُخبِرُكم بأفضلَ مِن دَرَجةِ الصِّيامِ والصَّلاةِ والصَّدقةِ؟». قالوا: بلى، يا رسولَ اللهِ. قال: «إصلاحُ ذاتِ البَينِ، وفسادُ ذاتِ البَينِ هيَ الحالِقةُ»", c:"أخرجه أبو داود والترمذي"}
+  ]}
+]},
+
+{ f:"مع النبي في الجنة", amal:[
+  {n:"كثرة السجود", src:[
+    {t:"عن ربيعة بن كعب الأسلمي رضي الله عنه قال: كنتُ أبيتُ مع رسول الله صلى الله عليه وسلم فأتيتُه بوَضوئِه وحاجتِه، فقال لي: «سَلْ». فقلتُ: أسألُكَ مُرافقتَكَ في الجنَّةِ. قال: «أو غيرَ ذلك؟». قلتُ: هو ذاكَ. قال: «فأعِنِّي على نفْسِكَ بكثرةِ السُّجودِ»", c:"أخرجه مسلم"}
+  ]}
+]},
+
+{ f:"حسن الخلق", amal:[
+  {n:"حسن الخلق", src:[
+    {t:"قال رسول الله صلى الله عليه وسلم: «إنَّ أحبَّكم إليَّ وأقرَبَكم منِّي مجلِسًا يومَ القيامةِ: محاسِنُكم أخلاقًا»", c:"صحيح"}
+  ]}
+]},
+
+{ f:"كفالة اليتيم", amal:[
+  {n:"كفالة اليتيم", src:[
+    {t:"عن سهل رضي الله عنه قال: قال رسول الله صلى الله عليه وسلم: «أنا وكافِلُ اليتيمِ في الجنَّةِ هكذا». وأشارَ بالسَّبَّابةِ والوُسطى، وفرَّجَ بينَهما شيئًا", c:"متفق عليه"}
+  ]}
+]},
+
+{ f:"ما يكفيني ويحفظني", amal:[
+  {n:"قراءة اخر ايتين من سورة البقرة", src:[
+    {t:"عن ابن مسعود رضي الله عنه قال: قال النبي صلى الله عليه وسلم: «مَن قرأَ بالآيتَينِ مِن آخِرِ سورةِ البقرةِ في ليلةٍ، كفتاه»", c:"متفق عليه"}
+  ]},
+  {n:"قراءة اية الكرسي", src:[
+    {t:"عن أبي هريرة رضي الله عنه قال: وكَّلَني رسول الله صلى الله عليه وسلم بحفظِ زكاةِ رمضانَ، فأتاني آتٍ فجعَل يَحثو مِنَ الطَّعامِ، فأخذْتُه فقلتُ: لَأرفَعَنَّكَ إلى رسولِ اللهِ صلى الله عليه وسلم. فقَصَّ الحديثَ، فقال: «إذا أوَيْتَ إلى فِراشِكَ فاقرَأْ آيةَ الكرسيِّ، لن يزالَ معَكَ مِنَ اللهِ حافظٌ، ولا يقرَبُكَ شيطانٌ حتى تُصبِحَ». وقال النبي صلى الله عليه وسلم: «صدَقَكَ وهو كذوبٌ، ذاكَ شيطانٌ»", c:"أخرجه البخاري معلقًا ووصله النسائي"}
+  ]},
+  {n:"حفظ اول عشر ايات من سورة الكهف", src:[
+    {t:"عن أبي الدرداء رضي الله عنه أن النبي صلى الله عليه وسلم قال: «مَن حفِظَ عَشرَ آياتٍ مِن أوَّلِ سورةِ الكهفِ، عُصِمَ مِنَ الدَّجَّالِ»", c:"أخرجه مسلم"}
+  ]}
+]},
+
+{ f:"ضياء من الجمعة للجمعة", amal:[
+  {n:"قراءة سورة الكهف يوم الجمعة", src:[
+    {t:"عن أبي سعيد الخدري رضي الله عنه أن النبي صلى الله عليه وسلم قال: «مَن قرأَ سورةَ الكهفِ في يومِ الجمعةِ، أضاءَ له مِنَ النُّورِ ما بينَ الجُمعتَينِ»", c:"أخرجه البيهقي"}
+  ]}
+]},
+
+{ f:"كالمجاهد او القائم الصائم", amal:[
+  {n:"السعي على الأرملة", src:[
+    {t:"عن أبي هريرة رضي الله عنه قال: قال النبي صلى الله عليه وسلم: «السَّاعي على الأرملةِ والمِسكينِ، كالمُجاهدِ في سبيلِ اللهِ، أو كالقائمِ اللَّيلَ الصَّائمِ النَّهارَ»", c:"متفق عليه"}
+  ]}
+]}
+];
+
+// ---------- STATE ----------
+let stack = ["home"];
+let selL1 = null;
+let selL2 = null;
+
+const screens = ["home","intro","l1","l2","l3"];
+function showScreen(name){
+  screens.forEach(s=>{ document.getElementById("screen-"+s).classList.toggle("active", s===name); });
+  document.getElementById("backBtn").classList.toggle("show", stack.length>1);
+  updateCrumb(name);
+  window.scrollTo({top:0, behavior:"instant"});
 }
 
-let state = defaultState();
-let saveTimer = null;
-
-function scheduleSave() {
-  const note = document.getElementById('saveNote');
-  if (note) note.textContent = 'Saving…';
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      if (note) note.textContent = 'Saved';
-      setTimeout(() => { if (note) note.textContent = ''; }, 1000);
-    } catch (e) {
-      if (note) note.textContent = 'Could not save';
-      console.error('Save error', e);
-    }
-  }, 250);
-}
-
-function loadState() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      state = Object.assign(defaultState(), parsed);
-    }
-  } catch (e) {
-    // no saved state yet, use defaults
+function updateCrumb(name){
+  const el = document.getElementById("crumb");
+  if(name==="l2" && selL1!==null){
+    const f = DATA[selL1].f;
+    el.textContent = f.length>26 ? f.slice(0,26)+"…" : f;
+  } else if(name==="l3" && selL1!==null && selL2!==null){
+    const n = DATA[selL1].amal[selL2].n;
+    el.textContent = n.length>26 ? n.slice(0,26)+"…" : n;
+  } else {
+    el.textContent = "";
   }
 }
 
-function cycleStatus(val) {
-  return (val + 1) % 3;
-}
-function statusClass(val) {
-  if (val === 1) return 'state-green';
-  if (val === 2) return 'state-red';
-  return '';
+function goHome(){ stack=["home"]; render(); }
+function goIntro(){ stack.push("intro"); render(); }
+function goLevel1(){ if(stack[stack.length-1] !== "l1") stack.push("l1"); render(); }
+function goBack(){ if(stack.length>1){ stack.pop(); render(); } }
+
+function render(){
+  const cur = stack[stack.length-1];
+  if(cur==="l1") buildL1();
+  if(cur==="l2") buildL2();
+  if(cur==="l3") buildL3();
+  showScreen(cur);
 }
 
-function renderStatusRow() {
-  const row = document.getElementById('statusRow');
-  row.innerHTML = '';
-  state.statusButtons.forEach((val, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'status-btn ' + statusClass(val);
-    btn.setAttribute('aria-label', 'Task button ' + (i+1));
-    btn.addEventListener('click', () => {
-      state.statusButtons[i] = cycleStatus(state.statusButtons[i]);
-      btn.className = 'status-btn ' + statusClass(state.statusButtons[i]);
-      scheduleSave();
-    });
-    row.appendChild(btn);
+function buildL1(){
+  const list = document.getElementById("list1");
+  list.innerHTML = "";
+  DATA.forEach((item, idx)=>{
+    const btn = document.createElement("div");
+    btn.className = "fadila-btn";
+    btn.textContent = item.f;
+    btn.onclick = ()=>{ selL1 = idx; selL2=null; stack.push("l2"); render(); };
+    list.appendChild(btn);
   });
 }
 
-function renderChess() {
-  const btn = document.getElementById('chessBtn');
-  btn.className = 'chess-btn ' + statusClass(state.chess);
-  btn.onclick = () => {
-    state.chess = cycleStatus(state.chess);
-    btn.className = 'chess-btn ' + statusClass(state.chess);
-    scheduleSave();
-  };
-}
-
-function renderTaskList(containerId, listKey, placeholder) {
-  const container = document.getElementById(containerId);
-  container.innerHTML = '';
-  state[listKey].forEach((item, i) => {
-    const row = document.createElement('div');
-    row.className = 'task-row';
-
-    const cb = document.createElement('button');
-    cb.className = 'checkbox' + (item.checked ? ' checked' : '');
-    cb.setAttribute('aria-label', 'Toggle task');
-    cb.addEventListener('click', () => {
-      state[listKey][i].checked = !state[listKey][i].checked;
-      cb.classList.toggle('checked', state[listKey][i].checked);
-      input.classList.toggle('done', state[listKey][i].checked);
-      scheduleSave();
-    });
-
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.className = 'task-input' + (item.checked ? ' done' : '');
-    input.placeholder = placeholder || 'Task';
-    input.value = item.text;
-    input.addEventListener('input', () => {
-      state[listKey][i].text = input.value;
-      scheduleSave();
-    });
-
-    row.appendChild(cb);
-    row.appendChild(input);
-    container.appendChild(row);
+function buildL2(){
+  const pill = document.getElementById("pillL1");
+  const item = DATA[selL1];
+  pill.innerHTML = `<span class="tag">اخترت</span><div class="tx">${item.f}</div>`;
+  const list = document.getElementById("list2");
+  list.innerHTML = "";
+  item.amal.forEach((a, idx)=>{
+    const btn = document.createElement("div");
+    btn.className = "amal-btn";
+    btn.innerHTML = `<div class="lb">${a.n}</div><div class="chev">‹</div>`;
+    btn.onclick = ()=>{ selL2 = idx; stack.push("l3"); render(); };
+    list.appendChild(btn);
   });
 }
 
-function renderDate() {
-  const field = document.getElementById('dateField');
-  field.value = state.date;
-  field.addEventListener('input', () => {
-    state.date = field.value;
-    scheduleSave();
+function buildL3(){
+  const item = DATA[selL1];
+  const a = item.amal[selL2];
+  const trail = document.getElementById("trailL3");
+  trail.innerHTML = `
+    <div class="chosen-pill"><span class="tag">الفضل</span><div class="tx">${item.f}</div></div>
+    <div class="chosen-pill"><span class="tag">العمل</span><div class="tx">${a.n}</div></div>
+  `;
+  const wrap = document.getElementById("sourcesWrap");
+  wrap.innerHTML = "";
+  a.src.forEach(s=>{
+    const card = document.createElement("div");
+    card.className = "source-card";
+    card.innerHTML = `<div class="txt">${s.t}</div>` + (s.c ? `<div class="cite">${s.c}</div>` : "");
+    wrap.appendChild(card);
   });
 }
 
-function renderAll() {
-  renderDate();
-  renderStatusRow();
-  renderTaskList('germanDentist', 'germanDentist');
-  renderTaskList('bestOfAllA', 'bestOfAllA');
-  renderTaskList('bestOfAllB', 'bestOfAllB');
-  renderTaskList('health', 'health');
-  renderChess();
-  renderTaskList('otherTasks', 'otherTasks');
-}
-
-function setupPdr() {
-  const overlay = document.getElementById('infoOverlay');
-  const titleEl = document.getElementById('infoTitle');
-  const textEl = document.getElementById('infoText');
-  const okBtn = document.getElementById('infoOk');
-
-  const content = {
-    plan: {
-      title: 'Plan',
-      text: 'How to be in a better position'
-    },
-    doStep: {
-      title: 'Do',
-      text: '1- Realize the distortion illusion: it wasn\'t that bad\n2- Scale it and accept it: not 0 or 100\n3- Divide and conquer: Don\'t overwhelm yourself'
-    },
-    review: {
-      title: 'Review',
-      text: 'Am I in a better position'
-    }
-  };
-
-  function openInfo(key) {
-    titleEl.textContent = content[key].title;
-    textEl.textContent = content[key].text;
-    overlay.classList.add('show');
-  }
-
-  document.getElementById('planBtn').addEventListener('click', () => openInfo('plan'));
-  document.getElementById('doBtn').addEventListener('click', () => openInfo('doStep'));
-  document.getElementById('reviewBtn').addEventListener('click', () => openInfo('review'));
-  okBtn.addEventListener('click', () => overlay.classList.remove('show'));
-  overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('show'); });
-}
-
-function setupReset() {
-  const resetBtn = document.getElementById('resetBtn');
-  const overlay = document.getElementById('modalOverlay');
-  const cancelBtn = document.getElementById('modalCancel');
-  const confirmBtn = document.getElementById('modalConfirm');
-
-  resetBtn.addEventListener('click', () => overlay.classList.add('show'));
-  cancelBtn.addEventListener('click', () => overlay.classList.remove('show'));
-  overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('show'); });
-
-  confirmBtn.addEventListener('click', () => {
-    state = defaultState();
-    renderAll();
-    overlay.classList.remove('show');
-    scheduleSave();
-  });
-}
-
-(function init() {
-  loadState();
-  renderAll();
-  setupPdr();
-  setupReset();
-})();
+render();
 </script>
 </body>
 </html>
